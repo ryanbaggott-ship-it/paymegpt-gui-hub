@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PayMeGPT Studio</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="ambient"></div>
+
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      <div class="logo-text">PayMe<span>GPT</span></div>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      Live
+    </div>
+  </div>
+
+  <!-- TAB NAV -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('generate')" id="tab-generate">
+      <span class="tab-icon">✨</span> Generate
+    </button>
+    <button class="tab-btn" onclick="switchTab('accounts')" id="tab-accounts">
+      <span class="tab-icon">👤</span> Accounts
+    </button>
+    <button class="tab-btn" onclick="switchTab('post')" id="tab-post">
+      <span class="tab-icon">📤</span> Post
+    </button>
+    <button class="tab-btn" onclick="switchTab('compose')" id="tab-compose">
+      <span class="tab-icon">⚡</span> Compose
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- GENERATE PANEL -->
+    <div class="panel active" id="panel-generate">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🎨</span> AI Image Generator</div>
+
+        <div class="form-group">
+          <label>QUICK PROMPTS</label>
+          <div class="chips">
+            <div class="chip" onclick="setPrompt('A cinematic product shot on dark background with dramatic lighting')">Product Shot</div>
+            <div class="chip" onclick="setPrompt('Minimalist brand logo concept with gradient colors')">Brand Logo</div>
+            <div class="chip" onclick="setPrompt('Social media banner with vibrant colors and modern typography')">Banner</div>
+            <div class="chip" onclick="setPrompt('Professional headshot portrait with soft studio lighting')">Portrait</div>
+            <div class="chip" onclick="setPrompt('Abstract background with flowing gradients and geometric shapes')">Abstract</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>PROMPT</label>
+          <textarea id="gen-prompt" rows="4" placeholder="Describe the image you want to generate...">A professional product photo of a modern laptop on a clean white desk with soft natural lighting</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>MODEL</label>
+          <div class="model-grid">
+            <div class="model-card selected" onclick="selectModel(this,'gpt-image-1.5')">
+              <div class="model-badge badge-openai">OpenAI</div>
+              <div class="model-name">GPT Image 1.5</div>
+              <div class="model-provider">Best quality</div>
+            </div>
+            <div class="model-card" onclick="selectModel(this,'gpt-image-1')">
+              <div class="model-badge badge-openai">OpenAI</div>
+              <div class="model-name">GPT Image 1</div>
+              <div class="model-provider">Balanced</div>
+            </div>
+            <div class="model-card" onclick="selectModel(this,'gemini-3-pro-image-preview')">
+              <div class="model-badge badge-google">Google</div>
+              <div class="model-name">Gemini 3 Pro</div>
+              <div class="model-provider">Photorealistic</div>
+            </div>
+            <div class="model-card" onclick="selectModel(this,'grok-imagine-image-pro')">
+              <div class="model-badge badge-xai">xAI</div>
+              <div class="model-name">Grok Imagine</div>
+              <div class="model-provider">Creative</div>
+            </div>
+            <div class="model-card" onclick="selectModel(this,'gpt-image-1-mini')">
+              <div class="model-badge badge-openai">OpenAI</div>
+              <div class="model-name">GPT Mini</div>
+              <div class="model-provider">Fast</div>
+            </div>
+            <div class="model-card" onclick="selectModel(this,'gemini-3.1-flash-image-preview')">
+              <div class="model-badge badge-google">Google</div>
+              <div class="model-name">Gemini Flash</div>
+              <div class="model-provider">Ultra fast</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:14px;">
+          <div>
+            <label>ASPECT RATIO</label>
+            <div class="ratio-grid">
+              <div class="ratio-btn selected" onclick="selectRatio(this,'1:1')"><span class="ratio-icon">⬛</span>1:1</div>
+              <div class="ratio-btn" onclick="selectRatio(this,'16:9')"><span class="ratio-icon">▬</span>16:9</div>
+              <div class="ratio-btn" onclick="selectRatio(this,'9:16')"><span class="ratio-icon">▮</span>9:16</div>
+              <div class="ratio-btn" onclick="selectRatio(this,'4:3')"><span class="ratio-icon">🟫</span>4:3</div>
+            </div>
+          </div>
+          <div>
+            <label>QUALITY</label>
+            <div class="quality-toggle">
+              <div class="q-btn selected" onclick="selectQuality(this,'standard')">Std</div>
+              <div class="q-btn" onclick="selectQuality(this,'high')">High</div>
+              <div class="q-btn" onclick="selectQuality(this,'ultra')">Ultra</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="generateImage()" id="gen-btn">
+          ✨ Generate Image
+        </button>
+      </div>
+
+      <!-- RESULT CARD -->
+      <div class="card" id="result-card" style="display:none;">
+        <div class="card-title"><span class="card-title-icon">🖼️</span> Result</div>
+        <div class="image-result" id="image-result">
+          <div class="image-placeholder">
+            <div class="image-placeholder-icon">🎨</div>
+            <div>Your image will appear here</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>IMAGE URL</label>
+          <div class="url-row">
+            <input type="text" id="result-url" readonly placeholder="URL will appear after generation">
+            <button class="btn btn-secondary btn-sm" onclick="copyUrl()">Copy</button>
+          </div>
+        </div>
+        <div class="image-actions">
+          <button class="btn btn-secondary" onclick="openImage()" style="flex:1;">
+            🔗 Open
+          </button>
+          <button class="btn btn-primary" onclick="goToPost()" style="flex:1;">
+            📤 Post It
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNTS PANEL -->
+    <div class="panel" id="panel-accounts">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🔗</span> Connected Accounts</div>
+        <button class="btn btn-primary" onclick="listAccounts()" id="accounts-btn">
+          🔄 Fetch Accounts
+        </button>
+      </div>
+
+      <div id="accounts-list">
+        <div class="empty-state">
+          <div class="empty-icon">👤</div>
+          <div class="empty-title">No accounts loaded</div>
+          <div class="empty-sub">Tap "Fetch Accounts" to load your connected social media profiles</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST PANEL -->
+    <div class="panel" id="panel-post">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">📤</span> Post to Social Media</div>
+
+        <div class="form-group">
+          <label>PLATFORM</label>
+          <div class="platform-pills">
+            <div class="platform-pill selected" onclick="selectPlatform(this,'facebook')">
+              <span class="picon">📘</span>Facebook
+            </div>
+            <div class="platform-pill" onclick="selectPlatform(this,'instagram')">
+              <span class="picon">📸</span>Instagram
+            </div>
+            <div class="platform-pill" onclick="selectPlatform(this,'twitter')">
+              <span class="picon">🐦</span>X/Twitter
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>PAGE / ACCOUNT ID</label>
+          <input type="text" id="post-page-id" placeholder="Enter your page or account ID">
+        </div>
+
+        <div class="form-group">
+          <label>MESSAGE</label>
+          <textarea id="post-message" rows="4" placeholder="What's on your mind?" oninput="updateCharCount(this)" maxlength="2200">Check out our latest product launch! 🚀</textarea>
+          <div class="char-count" id="char-count">0 / 2200</div>
+        </div>
+
+        <div class="form-group">
+          <label>IMAGE URL <span style="color:var(--muted);font-weight:400;">(optional, required for Instagram)</span></label>
+          <input type="url" id="post-image-url" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <div id="post-preview-section" style="display:none;">
+          <label style="margin-bottom:8px;">PREVIEW</label>
+          <div class="post-preview">
+            <img class="img-preview-mini" id="preview-thumb" src="" alt="">
+            <div class="post-preview-text" id="preview-text"></div>
+          </div>
+        </div>
+
+        <button class="btn btn-success" onclick="postToSocial()" id="post-btn">
+          🚀 Publish Post
+        </button>
+      </div>
+
+      <div id="post-result" style="display:none;">
+        <div class="card">
+          <div class="card-title"><span class="card-title-icon">✅</span> Post Result</div>
+          <div class="result-box" id="post-result-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPOSE PANEL -->
+    <div class="panel" id="panel-compose">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">⚡</span> Auto-Compose Workflow</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;">Generate an AI image and post it to social media in one seamless flow.</p>
+
+        <div class="step-indicator">
+          <div class="step active" id="cstep-1"><div class="step-num">1</div> Generate</div>
+          <div class="step-line"></div>
+          <div class="step" id="cstep-2"><div class="step-num">2</div> Platform</div>
+          <div class="step-line"></div>
+          <div class="step" id="cstep-3"><div class="step-num">3</div> Publish</div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div id="compose-step-1">
+          <div class="form-group">
+            <label>CONTENT IDEA</label>
+            <textarea id="compose-prompt" rows="3" placeholder="Describe your post idea...">A vibrant product launch announcement with bold colors and modern design</textarea>
+          </div>
+          <div class="form-group">
+            <label>CAPTION</label>
+            <textarea id="compose-caption" rows="3" placeholder="Your social media caption...">🚀 Something incredible is here. Are you ready? Drop a 🔥 below!</textarea>
+          </div>
+          <div class="form-group">
+            <label>MODEL</label>
+            <select id="compose-model">
+              <option value="gpt-image-1.5">GPT Image 1.5 (OpenAI) — Best</option>
+              <option value="gpt-image-1">GPT Image 1 (OpenAI)</option>
+              <option value="gpt-image-1-mini">GPT Image Mini (OpenAI) — Fast</option>
+              <option value="gemini-3-pro-image-preview">Gemini 3 Pro (Google)</option>
+              <option value="gemini-3.1-flash-image-preview">Gemini Flash (Google)</option>
+              <option value="grok-imagine-image-pro">Grok Imagine Pro (xAI)</option>
+              <option value="grok-imagine-image">Grok Imagine (xAI)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="composeGenerate()">
+            ✨ Generate Image
+          </button>
+          <div class="progress-bar" id="compose-progress" style="display:none;">
+            <div class="progress-fill" id="compose-progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- STEP 2 (hidden initially) -->
+        <div id="compose-step-2" style="display:none;">
+          <div class="divider"></div>
+          <div class="image-result has-image" style="margin-bottom:12px;">
+            <img id="compose-img" src="" alt="Generated" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <div class="form-group">
+            <label>PLATFORM</label>
+            <div class="platform-pills">
+              <div class="platform-pill selected" onclick="selectComposePlatform(this,'facebook')">
+                <span class="picon">📘</span>Facebook
+              </div>
+              <div class="platform-pill" onclick="selectComposePlatform(this,'instagram')">
+                <span class="picon">📸</span>Instagram
+              </div>
+              <div class="platform-pill" onclick="selectComposePlatform(this,'twitter')">
+                <span class="picon">🐦</span>X/Twitter
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>PAGE / ACCOUNT ID</label>
+            <input type="text" id="compose-page-id" placeholder="Enter your page or account ID">
+          </div>
+          <button class="btn btn-success" onclick="composePublish()" id="compose-publish-btn">
+            🚀 Publish Now
+          </button>
+        </div>
+
+        <!-- STEP 3 (hidden initially) -->
+        <div id="compose-step-3" style="display:none;">
+          <div class="divider"></div>
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-size:56px;margin-bottom:12px;">🎉</div>
+            <div style="font-size:18px;font-weight:800;margin-bottom:6px;">Posted Successfully!</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;" id="compose-success-msg"></div>
+          </div>
+          <div class="result-box" id="compose-result-box" style="margin-bottom:12px;"></div>
+          <button class="btn btn-secondary" onclick="resetCompose()">
+            ↩ Start Over
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Generating...</div>
+  <div class="loading-sub" id="loading-sub">This may take a moment</div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
